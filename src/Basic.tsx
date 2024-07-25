@@ -41,13 +41,17 @@ export const Basics = () => {
 
   const initializeVirtualBackgroundProcessor = async () => {
     const extension = new VirtualBackgroundExtension();
+    if (!extension.checkCompatibility()) {
+      // The current browser does not support the virtual background plugin, you can stop executing the subsequent logic
+      console.error("Does not support Virtual Background!");
+    }
     AgoraRTC.registerExtensions([extension]);
     const processor = extension.createProcessor();
     await processor.init();
     localCameraTrack!
       .pipe(processor)
       .pipe(localCameraTrack!.processorDestination);
-    processor.setOptions({ type: "color", color: "blue" });
+    processor.setOptions({ type: "blur", blurDegree: 3 });
 
     await processor.enable();
   };
