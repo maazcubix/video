@@ -8,13 +8,16 @@ import {
   usePublish,
   useRemoteUsers,
 } from "agora-rtc-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import "./App.css";
 import VirtualBackgroundExtension from "agora-extension-virtual-background";
 import AgoraRTC from "agora-rtc-sdk-ng";
+import { VideoExtension } from "deepar-agora-extension";
 
 export const Basics = () => {
+  const videoContainerRef = useRef(null);
+
   const [calling, setCalling] = useState(false);
   const isConnected = useIsConnected();
   const [appId, setAppId] = useState("c271e6e573664bf2ac2bbaef3ebb7ed4");
@@ -44,10 +47,21 @@ export const Basics = () => {
     localCameraTrack!
       .pipe(processor)
       .pipe(localCameraTrack!.processorDestination);
-    processor.setOptions({ type: "blur", blurDegree: 3 });
+    processor.setOptions({ type: "color", color: "blue" });
+
     await processor.enable();
   };
-
+  useEffect(() => {
+    // Request camera permissions when the component mounts
+    const requestCameraPermission = async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      } catch (err) {
+        console.error("Error requesting camera permissions:", err);
+      }
+    };
+    requestCameraPermission();
+  }, []);
   useEffect(() => {
     if (localCameraTrack) {
       initializeVirtualBackgroundProcessor();
@@ -132,6 +146,7 @@ export const Basics = () => {
           </button>
         </div>
       )}
+      Q
     </>
   );
 };
